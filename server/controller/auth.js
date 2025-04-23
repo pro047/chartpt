@@ -9,7 +9,7 @@ const bcryptSaltRounds = 12;
 
 export async function signUp(req, res) {
   const { email, password, name } = req.body;
-  const found = await authRepository.createUser(email);
+  const found = await authRepository.findByEmail(email);
   if (found) {
     res.status(409).json({ message: `${email} already exists` });
   }
@@ -19,7 +19,8 @@ export async function signUp(req, res) {
     password: hash,
     name,
   });
-  token = createJwtToken(userEmail);
+  const token = createJwtToken(userEmail);
+  setToken(res, token);
   res.status(200).json({ token, name });
 }
 
@@ -27,18 +28,43 @@ export async function login(req, res) {
   const { email, password } = req.body;
   const user = await authRepository.findByEmail(email);
   if (!user) {
-    return res.status(401).json({ message: 'Invalid user or password' });
+    return res.status(401).json({ message: 'Invalid user or password 1' });
   }
   const userPassword = await bcrypt.compare(password, user.password);
   if (!userPassword) {
-    return res.status(401).json({ message: 'Invalid user or password' });
+    return res.status(401).json({ message: 'Invalid user or password 2' });
   }
   const token = createJwtToken(user.email);
-  res.status(200).json({ token, userEmail });
+  setToken(res, token);
+  res.status(200).json({ token, email });
+}
+
+export async function logout(req, res, next) {
+  res.cookie('token', '');
+  res.status(200).json({ message: 'User has been logged out' });
+}
+
+export async function me(req, res, next) {
+  const user = await authRepository.findByEmail(req.email);
+  if (!user) {
+    return res.status(404).json({ message: 'user not found' });
+  }
+  console.log('user', user);
+  res.status(200).json({ token: req.token, name: req.name });
 }
 
 function createJwtToken(email) {
   return jwt.sign({ email }, jwtSecrteKey, { expiresIn: jwtExpiresIn });
+}
+
+function setToken(res, token) {
+  const options = {
+    maxAges: jwtExpiresIn * 1000,
+    httpOnly: true,
+    sameSite: 'none',
+    secure: true,
+  };
+  res.cookie('token', token, options);
 }
 
 export async function csrfToken(req, res, next) {
@@ -46,6 +72,6 @@ export async function csrfToken(req, res, next) {
   res.status(200).json({ csrfToken });
 }
 
-function generateCSRFToken() {
+export function generateCSRFToken() {
   return bcrypt.hash('SfKsT2K0hutMSeVQ5', 1);
 }

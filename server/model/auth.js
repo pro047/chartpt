@@ -1,9 +1,11 @@
-// import { db } from '../db/database.js';
+import { db } from '../db/database.js';
 
 export async function findByEmail(email) {
   return db
     .execute('SELECT * FROM users WHERE email=?', [email])
-    .then(console.log);
+    .then((result) => {
+      return result[0][0];
+    });
 }
 
 export async function createUser(user) {
@@ -14,5 +16,5 @@ export async function createUser(user) {
       password,
       name,
     ])
-    .then(console.log);
+    .then((result) => console.log('result :', result));
 }
