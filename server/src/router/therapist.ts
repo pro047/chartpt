@@ -1,6 +1,6 @@
 import express from 'express';
-import * as therapistController from '../controller/therapist.js';
-import { authenticationToken } from '../middleware/auth.js';
+import * as therapistController from '@controller/therapist/therapist';
+import { authenticationToken } from '../middleware/auth';
 
 const router = express.Router();
 
