@@ -2,7 +2,6 @@ import { CookieOptions, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import * as authRepository from '../../model/auth/auth';
-import { User } from '../../types/user';
 
 // todo 상수변수 나중에 config하기
 const jwtSecrteKey = 'Ck6z42QGbpWUuEtM';

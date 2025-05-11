@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import authRouter from '@router/auth';
 import therapistRouter from '@router/therapist';
+import patientRouter from '@router/patient';
 import { csrfCheck } from '@middleware/csrf';
 import { errorHandler } from '@middleware/errors';
 import './types/express';
@@ -23,9 +24,12 @@ app.use(helmet());
 app.use(express.json());
 app.use(cors(corsOption));
 
-// app.use(csrfCheck);
+app.use((req, res, next) => {
+  csrfCheck(req, res, next).catch(next);
+});
 app.use('/auth', authRouter);
 app.use('/therapist', therapistRouter);
+app.use('/patient', patientRouter);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.sendStatus(404);

@@ -1,7 +1,11 @@
 import bcrypt from 'bcrypt';
-import { middleWare } from 'types/middleware';
+import { NextFunction, Request, Response } from 'express';
 
-export const csrfCheck: middleWare = async (req, res, next) => {
+export const csrfCheck = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     if (['GET', 'OPTIONS', 'HEAD'].includes(req.method)) {
       return next();
